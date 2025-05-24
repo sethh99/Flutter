@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'home_screen.dart';
+import 'register_screen.dart';
+import 'package:flutter/gestures.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,27 +11,25 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   void _login() {
-    String email = _emailController.text.trim();
-    String password = _passwordController.text;
-
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please enter both email and password.")),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(email: email),
-        ),
-      );
-    }
+    // Ignore input values, just route to HomeScreen with hardcoded username 'noy'
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomeScreen(username: 'noy'),
+      ),
+    );
   }
 
+  void _goToRegister() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => RegisterScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,18 +41,18 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Spacer(),
             Text(
               'Welcome Back!',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 32),
             TextField(
-              controller: _emailController,
+              controller: _usernameController,
               decoration: InputDecoration(
-                labelText: 'Email',
-                prefixIcon: Icon(Icons.email),
+                labelText: 'Username',
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
               ),
             ),
@@ -75,6 +74,24 @@ class _LoginScreenState extends State<LoginScreen> {
                 minimumSize: Size.fromHeight(50),
               ),
             ),
+            Spacer(),
+            RichText(
+              text: TextSpan(
+                text: "Don't have an account? ",
+                style: TextStyle(color: Colors.black),
+                children: [
+                  TextSpan(
+                    text: 'Register.',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                    recognizer: TapGestureRecognizer()..onTap = _goToRegister,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
           ],
         ),
       ),
