@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
 import 'register_screen.dart';
+import 'phone_verification_screen.dart';
 import 'package:flutter/gestures.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,11 +15,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   void _login() {
-    // Ignore input values, just route to HomeScreen with hardcoded username 'noy'
+    // Navigate to PhoneVerificationScreen instead of HomeScreen
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => HomeScreen(username: 'noy'),
+        builder: (context) => PhoneVerificationScreen(username: 'noy'),
       ),
     );
   }
@@ -29,6 +29,16 @@ class _LoginScreenState extends State<LoginScreen> {
       context,
       MaterialPageRoute(builder: (context) => RegisterScreen()),
     );
+  }
+
+  void _loginWithFacebook() {
+    // Placeholder for Facebook login logic
+    print('Facebook login pressed');
+  }
+
+  void _loginWithGoogle() {
+    // Placeholder for Google login logic
+    print('Google login pressed');
   }
 
   @override
@@ -72,6 +82,33 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Text('Login'),
               style: ElevatedButton.styleFrom(
                 minimumSize: Size.fromHeight(50),
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'or',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _loginWithFacebook,
+              icon: Icon(Icons.facebook, color: Colors.white),
+              label: Text('Login with Facebook'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size.fromHeight(50),
+                backgroundColor: Color(0xFF3b5998),
+                foregroundColor: Colors.white,
+              ),
+            ),
+            SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: _loginWithGoogle,
+              icon: Icon(Icons.g_mobiledata, color: Colors.white),
+              label: Text('Login with Google'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size.fromHeight(50),
+                backgroundColor: Color(0xFF4285F4),
+                foregroundColor: Colors.white,
               ),
             ),
             Spacer(),

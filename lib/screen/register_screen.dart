@@ -17,14 +17,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _register() {
     if (_formKey.currentState!.validate()) {
       // Here you can handle registration logic like sending data to backend
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registered successfully!')),
       );
-
       // Optionally, you can navigate back to login screen or home screen
       Navigator.pop(context); // For example, go back to login screen
     }
+  }
+
+  void _registerWithFacebook() {
+    // Placeholder for Facebook registration logic
+    print('Facebook registration pressed');
+  }
+
+  void _registerWithGoogle() {
+    // Placeholder for Google registration logic
+    print('Google registration pressed');
   }
 
   @override
@@ -61,8 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Enter email';
-                  final emailRegex = RegExp(
-                      r'^[^@]+@[^@]+\.[^@]+'); // simple email validation
+                  final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
                   if (!emailRegex.hasMatch(value)) return 'Enter valid email';
                   return null;
                 },
@@ -87,6 +94,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Text('Register'),
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size.fromHeight(50),
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'or',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: _registerWithFacebook,
+                icon: Icon(Icons.facebook, color: Colors.white),
+                label: Text('Register with Facebook'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size.fromHeight(50),
+                  backgroundColor: Color(0xFF3b5998), // Facebook blue
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: _registerWithGoogle,
+                icon: Icon(Icons.g_mobiledata, color: Colors.white),
+                label: Text('Register with Google'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size.fromHeight(50),
+                  backgroundColor: Color(0xFF4285F4), // Google blue
+                  foregroundColor: Colors.white,
                 ),
               ),
             ],
