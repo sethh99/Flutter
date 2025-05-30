@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
-import 'package:flutter/gestures.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final String? registeredUsername;
+  final String? registeredPassword;
+
+  const LoginScreen({super.key, this.registeredUsername, this.registeredPassword});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -15,83 +17,94 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   void _login() {
-    // Ignore input values, just route to HomeScreen with hardcoded username 'noy'
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomeScreen(username: 'noy'),
-      ),
-    );
+    final inputUsername = _usernameController.text.trim();
+    final inputPassword = _passwordController.text;
+
+    if (inputUsername.isEmpty || inputPassword.isEmpty) {
+      _showMessage('Please enter both username and password.');
+      return;
+    }
+
+    if (inputUsername == widget.registeredUsername && inputPassword == widget.registeredPassword) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(username: inputUsername),
+        ),
+      );
+    } else {
+      _showMessage('Invalid username or password.');
+    }
   }
 
-  void _goToRegister() {
-    Navigator.push(
+  void _goToRegister() async {
+    final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => RegisterScreen()),
+      MaterialPageRoute(builder: (context) => const RegisterScreen()),
     );
+
+    if (result != null && mounted) {
+      final data = result as Map<String, String>;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(
+            registeredUsername: data['username'],
+            registeredPassword: data['password'],
+          ),
+        ),
+      );
+    }
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Login'), centerTitle: true),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Spacer(),
-            Text(
+            const Spacer(),
+            const Text(
               'Welcome Back!',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
             TextField(
               controller: _usernameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Username',
                 prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
               obscureText: true,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Password',
                 prefixIcon: Icon(Icons.lock),
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _login,
-              child: Text('Login'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size.fromHeight(50),
-              ),
+              child: const Text('Login'),
+              style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
             ),
-            Spacer(),
-            RichText(
-              text: TextSpan(
-                text: "Don't have an account? ",
-                style: TextStyle(color: Colors.black),
-                children: [
-                  TextSpan(
-                    text: 'Register.',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
-                    recognizer: TapGestureRecognizer()..onTap = _goToRegister,
-                  ),
-                ],
-              ),
+            const Spacer(),
+            TextButton(
+              onPressed: _goToRegister,
+              child: const Text("Don't have an account? Register."),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
           ],
         ),
       ),
