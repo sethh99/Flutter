@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'register_screen.dart';
-import 'phone_verification_screen.dart';
-import 'package:flutter/gestures.dart';
+import 'home_screen.dart'; // Make sure this path is correct
+import 'register_screen.dart'; // Make sure this path is correct
+import 'package:flutter/gestures.dart'; // Already imported
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,17 +11,42 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _usernameController = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // New: Global key for the form
+  final TextEditingController _emailController = TextEditingController(); // Changed to email
   final TextEditingController _passwordController = TextEditingController();
 
+  bool _isPasswordVisible = false;
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    }
+    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+      return 'Please enter a valid email address';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your password';
+    }
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters long';
+    }
+    return null;
+  }
+
   void _login() {
-    // Navigate to PhoneVerificationScreen instead of HomeScreen
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PhoneVerificationScreen(username: 'noy'),
-      ),
-    );
+    if (_formKey.currentState!.validate()) { // New: Trigger form validation
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(username: _emailController.text.split('@')[0]), // Use email part as username
+        ),
+      );
+    }
   }
 
   void _goToRegister() {
@@ -31,105 +56,91 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _loginWithFacebook() {
-    // Placeholder for Facebook login logic
-    print('Facebook login pressed');
-  }
-
-  void _loginWithGoogle() {
-    // Placeholder for Google login logic
-    print('Google login pressed');
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
         centerTitle: true,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Spacer(),
-            Text(
-              'Welcome Back!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 32),
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(
-                labelText: 'Username',
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
+        padding: const EdgeInsets.all(16.0),
+        child: Form( // New: Wrap content in a Form widget
+          key: _formKey, // Assign the global key to the form
+          child: Column(
+            children: [
+              const Spacer(),
+              const Text(
+                'Welcome Back!',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                prefixIcon: Icon(Icons.lock),
-                border: OutlineInputBorder(),
+              const SizedBox(height: 32),
+              TextFormField( // Changed to TextFormField
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress, // Suggest email keyboard
+                decoration: const InputDecoration(
+                  labelText: 'Email', // Changed label to Email
+                  prefixIcon: Icon(Icons.email), // Changed icon to email
+                  border: OutlineInputBorder(),
+                ),
+                validator: _validateEmail, // Assign validator function
               ),
-            ),
-            SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _login,
-              child: Text('Login'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size.fromHeight(50),
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'or',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: _loginWithFacebook,
-              icon: Icon(Icons.facebook, color: Colors.white),
-              label: Text('Login with Facebook'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size.fromHeight(50),
-                backgroundColor: Color(0xFF3b5998),
-                foregroundColor: Colors.white,
-              ),
-            ),
-            SizedBox(height: 8),
-            ElevatedButton.icon(
-              onPressed: _loginWithGoogle,
-              icon: Icon(Icons.g_mobiledata, color: Colors.white),
-              label: Text('Login with Google'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size.fromHeight(50),
-                backgroundColor: Color(0xFF4285F4),
-                foregroundColor: Colors.white,
-              ),
-            ),
-            Spacer(),
-            RichText(
-              text: TextSpan(
-                text: "Don't have an account? ",
-                style: TextStyle(color: Colors.black),
-                children: [
-                  TextSpan(
-                    text: 'Register.',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
+              const SizedBox(height: 16),
+              TextFormField( // Changed to TextFormField
+                controller: _passwordController,
+                obscureText: !_isPasswordVisible, // Control visibility
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  prefixIcon: const Icon(Icons.lock),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton( // New: Suffix icon for password visibility
+                    icon: Icon(
+                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                     ),
-                    recognizer: TapGestureRecognizer()..onTap = _goToRegister,
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible; // Toggle visibility
+                      });
+                    },
                   ),
-                ],
+                ),
+                validator: _validatePassword, // Assign validator function
               ),
-            ),
-            SizedBox(height: 16),
-          ],
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _login,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50),
+                ),
+                child: const Text('Login'),
+              ),
+              const Spacer(),
+              RichText(
+                text: TextSpan(
+                  text: "Don't have an account? ",
+                  style: const TextStyle(color: Colors.black),
+                  children: [
+                    TextSpan(
+                      text: 'Register.',
+                      style: const TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()..onTap = _goToRegister,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
