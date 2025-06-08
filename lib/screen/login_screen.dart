@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (user != null) {
-      // **CHANGE HERE: Navigate directly to HomeScreen.**
+      // Navigate directly to HomeScreen after a successful login.
       navigator.pushReplacement(
         MaterialPageRoute(
           builder: (context) => HomeScreen(user: user),
@@ -60,6 +60,22 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const RegisterScreen(),
+      ),
+    );
+  }
+
+  void _goToForgotPassword() {
+    // Since the PhoneVerificationScreen expects a user map,
+    // we pass a dummy map for the forgot password flow.
+    final dummyUser = {
+      "username": "Guest",
+      "email": "",
+      "password": ""
+    };
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PhoneVerificationScreen(user: dummyUser),
       ),
     );
   }
@@ -103,10 +119,20 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: const Text('Login'),
             ),
-            TextButton(
-              onPressed: _goToRegister,
-              child: const Text("Don't have an account? Register"),
-            )
+            // **NEW WIDGET: Row for Register and Forgot Password links**
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: _goToRegister,
+                  child: const Text("Don't have an account?"),
+                ),
+                TextButton(
+                  onPressed: _goToForgotPassword,
+                  child: const Text('Forgot Password?'),
+                ),
+              ],
+            ),
           ],
         ),
       ),
