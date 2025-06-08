@@ -1,13 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 
 class PhoneVerificationScreen extends StatefulWidget {
-  final String username;
+  // **FIX: This screen must accept the entire user map.**
+  final Map<String, dynamic> user;
 
-  const PhoneVerificationScreen({super.key, required this.username});
+  const PhoneVerificationScreen({super.key, required this.user});
 
   @override
-  State<PhoneVerificationScreen> createState() => _PhoneVerificationScreenState();
+  State<PhoneVerificationScreen> createState() =>
+      _PhoneVerificationScreenState();
 }
 
 class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
@@ -18,33 +21,48 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
   List.generate(6, (_) => TextEditingController());
   bool _isOtpScreen = false;
 
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    for (var controller in _otpControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
   void _submitPhoneNumber() {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     if (_phoneFormKey.currentState!.validate()) {
-      // Placeholder for sending phone number to backend and triggering OTP
-      print('Phone number submitted: ${_phoneController.text}');
+      if (kDebugMode) {
+        debugPrint('Phone number submitted: ${_phoneController.text}');
+      }
       setState(() {
         _isOtpScreen = true;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text('OTP sent to ${_phoneController.text}')),
       );
     }
   }
 
   void _verifyOtp() {
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     if (_otpFormKey.currentState!.validate()) {
-      // Combine OTP digits
       String otp = _otpControllers.map((controller) => controller.text).join();
-      // Placeholder for OTP verification logic
-      print('OTP submitted: $otp');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('OTP verified successfully!')),
+      if (kDebugMode) {
+        debugPrint('OTP submitted: $otp');
+      }
+
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('OTP verified successfully!')),
       );
-      // Navigate to HomeScreen after successful OTP verification
-      Navigator.pushReplacement(
-        context,
+
+      // **FIX: Pass the user map to the HomeScreen.**
+      navigator.pushReplacement(
         MaterialPageRoute(
-          builder: (context) => HomeScreen(username: widget.username),
+          builder: (context) => HomeScreen(user: widget.user),
         ),
       );
     }
@@ -68,11 +86,11 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     return Form(
       key: _phoneFormKey,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Spacer(),
           const Text(
             'Enter Your Phone Number',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 32),
           TextFormField(
@@ -81,18 +99,16 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
               labelText: 'Phone Number',
               prefixIcon: Icon(Icons.phone),
               border: OutlineInputBorder(),
-              hintText: 'e.g., 012345566 or +85512345566',
+              hintText: 'e.g., 012345678',
             ),
             keyboardType: TextInputType.phone,
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Enter phone number';
               }
-              // Regex for Cambodian phone numbers: +855 or 0 followed by valid prefix and 6 digits
-              final phoneRegex = RegExp(
-                  r'^((\+855|0)(10|11|12|15|16|17|69|70|76|77|78|85|89|92|95|99)\d{6})$');
+              final phoneRegex = RegExp(r'^((\+855|0)(10|11|12|15|16|17|69|70|76|77|78|81|85|86|87|89|92|93|95|96|98|99)\d{6,7})$');
               if (!phoneRegex.hasMatch(value)) {
-                return 'Enter a valid Cambodian phone number (e.g., 012345566 or +85512345566)';
+                return 'Enter a valid Cambodian phone number';
               }
               return null;
             },
@@ -100,12 +116,11 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: _submitPhoneNumber,
-            child: const Text('Send OTP'),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size.fromHeight(50),
             ),
+            child: const Text('Send OTP'),
           ),
-          const Spacer(),
         ],
       ),
     );
@@ -115,11 +130,11 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     return Form(
       key: _otpFormKey,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Spacer(),
           const Text(
             'Enter OTP',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
@@ -157,23 +172,13 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: _verifyOtp,
-            child: const Text('Verify OTP'),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size.fromHeight(50),
             ),
+            child: const Text('Verify OTP'),
           ),
-          const Spacer(),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _phoneController.dispose();
-    for (var controller in _otpControllers) {
-      controller.dispose();
-    }
-    super.dispose();
   }
 }

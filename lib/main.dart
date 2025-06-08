@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:w2pro/screen/login_screen.dart';
+import 'screen/login_screen.dart';
 
 void main() {
-  runApp(LoginApp());
+  runApp(const MyApp());
 }
 
-class LoginApp extends StatelessWidget {
-  const LoginApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Login Screen',
-      home: LoginScreen(),
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      // Use named routes for clean navigation
+      initialRoute: '/',
+      routes: {
+        // When navigating to the "/" route, build the LoginScreen widget.
+        '/': (context) => const LoginScreen(),
+      },
     );
   }
 }
-
-
