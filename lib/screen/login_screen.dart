@@ -19,6 +19,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  // 1. ADD A STATE VARIABLE TO TRACK PASSWORD VISIBILITY
+  bool _isPasswordVisible = false;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -102,13 +105,30 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            // 2. UPDATE THE PASSWORD TEXTFeiLD
             TextField(
               controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
+              // Use the state variable to control password visibility
+              obscureText: !_isPasswordVisible,
+              decoration: InputDecoration(
                 labelText: 'Password',
-                prefixIcon: Icon(Icons.lock),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.lock),
+                border: const OutlineInputBorder(),
+                // Add the eye icon to the end of the text field
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    // Change the icon based on the state
+                    _isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                  ),
+                  onPressed: () {
+                    // Update the state to toggle password visibility
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -119,7 +139,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: const Text('Login'),
             ),
-            // **NEW WIDGET: Row for Register and Forgot Password links**
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
