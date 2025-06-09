@@ -4,10 +4,14 @@
     "email": "test@example.com",
     "password": "password123"
   },
-
   {
     "username": "seth",
     "email": "seth@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "username": "rith",
+    "email": "rith@gmail.com",
     "password": "12345678"
   }
 ]

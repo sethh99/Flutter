@@ -1,5 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+// Import your AuthService
+import '../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -23,30 +25,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  // UPDATED _register method
   void _register() {
-    // Capture context before async gap, although not strictly needed here, it's good practice.
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
 
     if (_formKey.currentState!.validate()) {
-      // Use debugPrint for development-only messages.
-      if (kDebugMode) {
-        debugPrint('--- New User Data ---');
-        debugPrint('Add this to your assets/db.json file:');
-        debugPrint('{"username": "${_usernameController.text}", "email": "${_emailController.text}", "password": "${_passwordController.text}"}');
-        debugPrint('-----------------------');
-      }
+      // Create the new user object.
+      final newUser = {
+        "username": _usernameController.text,
+        "email": _emailController.text,
+        "password": _passwordController.text,
+      };
+
+      // Register the user with the AuthService.
+      AuthService.registerUser(newUser);
 
       scaffoldMessenger.showSnackBar(
         const SnackBar(content: Text('Registered successfully! Please login.')),
       );
 
-      navigator.pop();
+      navigator.pop(); // Go back to the login screen.
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // The rest of your build method remains exactly the same...
     return Scaffold(
       appBar: AppBar(
         title: const Text('Register'),
@@ -104,7 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(50),
                 ),
-                child: const Text('Register'), // 'child' is now the last argument
+                child: const Text('Register'),
               ),
             ],
           ),

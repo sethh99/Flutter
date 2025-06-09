@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'screen/login_screen.dart';
 
-void main() {
+// 1. IMPORT THE AUTH SERVICE
+import 'services/auth_service.dart';
+
+// 2. MAKE THE MAIN FUNCTION ASYNCHRONOUS
+void main() async {
+  // 3. ADD THESE TWO LINES TO INITIALIZE THE SERVICE
+  WidgetsFlutterBinding.ensureInitialized();
+  await AuthService.init();
+
   runApp(const MyApp());
 }
 
